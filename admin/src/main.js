@@ -8,6 +8,7 @@ Vue.use(Vuex)
 
 Vue.config.productionTip = false
 Vue.prototype.$http = http;
+
 new Vue({
   render: h => h(App),
   router
