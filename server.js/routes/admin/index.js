@@ -10,11 +10,17 @@ router.post('/categories',async (req,res)=>{
     res.send(model)
 })
 router.put('/categories/:id',async (req,res)=>{
-    const model = await Category.findByIdAndUpdate(req.params.id,req.body)
+   await Category.findByIdAndUpdate(req.params.id,req.body)
+    res.send({
+        success:true
+    })
+})
+router.delete('/categories/:id',async (req,res)=>{
+    const model = await Category.findByIdAndDelete(req.params.id,req.body)
     res.send(model)
 })
 router.get('/categories',async (req,res)=>{
-    const items = await Category.find().limit(10)
+    const items = await Category.find().populate('parent').limit(10)
     res.send(items)
 })
 router.get('/categories/:id',async (req,res)=>{
