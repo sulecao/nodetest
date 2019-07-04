@@ -17,3 +17,18 @@ next()
 },router)    
 }
 ```
+
+实现物品图标上传
+使用插件multer获得前端传来的图片
+开放出一个uploads文件夹
+app.use('/uploads',express.static(__dirname+'/uploads'))
+添加一个文件路径返回给前端
+```
+const multer = require('multer')
+const upload = multer({dest:__dirname+'/../../uploads'})
+app.post('/admin/api/upload',upload.single('file'),async (req,res)=>{
+    const file = req.file
+    file.url = `http://localhost:3000/uploads/${file.filename}`
+    res.send(file)
+})
+```

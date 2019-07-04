@@ -5,7 +5,8 @@ const app = express()
 app.use(require('cors')())
 // 处理post？
 app.use(express.json())
-
+// 开放静态资源
+app.use('/uploads',express.static(__dirname+'/uploads'))
 
 require('./plugins/db')(app)
 require('./routes/admin/index')(app)
