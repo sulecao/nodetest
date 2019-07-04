@@ -1,32 +1,47 @@
 module.exports = function(app){
 
 const express = require('express')
-const router = express.Router()
+const router = express.Router({
+    // 合并url参数
+ mergeParams:true
+})
 
-const   Category  = require('../../models.js/Category')
-console.log(Category)
-router.post('/categories',async (req,res)=>{
-    const model = await Category.create(req.body)
+// 写通用接口，不再单独引入模块
+// const   Category  = require('../../models.js/Category')
+
+router.post('/',async (req,res)=>{
+    console.log(req.Model)
+    const model = await req.Model.create(req.body)
     res.send(model)
 })
-router.put('/categories/:id',async (req,res)=>{
-   await Category.findByIdAndUpdate(req.params.id,req.body)
+router.put('/:id',async (req,res)=>{
+   await req.Model.findByIdAndUpdate(req.params.id,req.body)
     res.send({
         success:true
     })
 })
-router.delete('/categories/:id',async (req,res)=>{
-    const model = await Category.findByIdAndDelete(req.params.id,req.body)
+router.delete('/:id',async (req,res)=>{
+    const model = await req.Model.findByIdAndDelete(req.params.id,req.body)
     res.send(model)
 })
-router.get('/categories',async (req,res)=>{
-    const items = await Category.find().populate('parent').limit(10)
+router.get('/',async (req,res)=>{
+    // 特别的路由需求需要判断
+    const queryOptions = {}
+    if (req.Model.modelName === 'Category') {
+      queryOptions.populate = 'parent'
+    }
+    const items = await req.Model.find().setOptions(queryOptions).limit(10)
     res.send(items)
 })
-router.get('/categories/:id',async (req,res)=>{
-    const model = await Category.findById(req.params.id)
+router.get('/:id',async (req,res)=>{
+    const model = await req.Model.findById(req.params.id)
     res.send(model)
 })
 // ??
-app.use('/admin/api',router)    
+app.use('/admin/api/rest/:resource',async(req,res,next)=>{
+// inflection插件将复数小写转化为大写类型名
+const modelName = require('inflection').classify(req.params.resource)
+req.Model = require(`../../models.js/${modelName}`)
+next()
+},router)    
 }
